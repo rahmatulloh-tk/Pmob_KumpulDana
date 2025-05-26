@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Kumpul Dana</string>
+    <string name="logo_description">Logo Kumpul Dana</string>
+    <string name="welcome_back">WELCOME BACK!</string>
+    <string name="login_to_your_account">Login to your account</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="remember_me">Remember Me?</string>
+    <string name="forgot_password">Lupa Password</string>
+    <string name="login_button">LOG IN</string>
+    <string name="dont_have_account">Don\'t have an account?</string>
+    <string name="create_account_link">Create an account</string>
+
+    <string name="welcome_reg">WELCOME</string>
+    <string name="create_your_account">Create Your Account</string>
+    <string name="email_hint">Email</string>
+    <string name="mobile_number_hint">Mobile Number</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="create_account_button">Create Account</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="login_here_link">Login Here</string>
+
+    <string name="donasi_header">DONASI</string>
+    <string name="isi_form_donasi_text">Isi Form Donasi</string>
+    <string name="isi_form_donasi_button">Isi Form Donasi</string>
+    <string name="riwayat_donasi_header">Riwayat Donasi</string>
+    <string name="lihat_riwayat_donasi_button">Lihat Riwayat Donasi</string>
+    <string name="edit_profil_button">Edit Profil</string>
+
+    <string name="donasi_admin_header">DONASI (ADMIN)</string>
+    <string name="tambah_proyek_donasi_text">Tambah Proyek Donasi</string>
+    <string name="tambah_proyek_button">Tambah Proyek Donasi</string>
+    <string name="riwayat_donasi_admin_header">Riwayat Donasi (ADMIN)</string>
+    <string name="lihat_riwayat_donasi_admin_button">Lihat Riwayat Donasi</string>
+
+</resources>

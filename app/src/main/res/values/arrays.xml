@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="payment_methods">
+        <item>Pilih Metode Pembayaran</item>
+        <item>Transfer Bank</item>
+        <item>E-Wallet (OVO, GoPay, DANA)</item>
+        <item>Kartu Kredit</item>
+        <item>Kartu Debit</item>
+        <item>QRIS</item>
+    </string-array>
+</resources>

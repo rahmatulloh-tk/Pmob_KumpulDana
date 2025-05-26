@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:contentPadding="16dp"
+    android:backgroundTint="@color/card_background">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageViewProject"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/project_1"
+            app:layout_constraintDimensionRatio="16:9"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textViewProjectTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Judul Proyek Donasi Ini"
+            android:textColor="@color/text_dark"
+            android:textSize="18sp"
+            android:fontFamily="@font/opensans_bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/textViewTimeLeft"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewProject" />
+
+        <TextView
+            android:id="@+id/textViewTimeLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sisa: 10 Hari"
+            android:textColor="@color/orange_accent"
+            android:textSize="12sp"
+            android:fontFamily="@font/opensans_semibold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textViewProjectTitle"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewProjectTitle" />
+
+        <TextView
+            android:id="@+id/textViewProjectDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Deskripsi singkat tentang tujuan proyek ini. Membantu anak-anak kurang mampu untuk mendapatkan pendidikan."
+            android:textColor="@color/text_dark"
+            android:textSize="14sp"
+            android:fontFamily="@font/opensans_regular"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewProjectTitle" />
+
+        <ProgressBar
+            android:id="@+id/progressBarProject"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="0dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="12dp"
+            android:progressDrawable="@drawable/custom_progress_bar"
+            android:max="100"
+            android:progress="75"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewProjectDescription" />
+
+        <TextView
+            android:id="@+id/textViewCollectedAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Rp 7.500.000"
+            android:textColor="@color/text_dark"
+            android:textSize="14sp"
+            android:fontFamily="@font/opensans_semibold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/progressBarProject" />
+
+        <TextView
+            android:id="@+id/textViewTargetAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="dari Rp 10.000.000"
+            android:textColor="@color/text_hint"
+            android:textSize="12sp"
+            android:fontFamily="@font/opensans_regular"
+            android:layout_marginStart="4dp"
+            app:layout_constraintStart_toEndOf="@+id/textViewCollectedAmount"
+            app:layout_constraintTop_toBottomOf="@+id/progressBarProject"
+            app:layout_constraintBaseline_toBaselineOf="@+id/textViewCollectedAmount"/>
+
+        <Button
+            android:id="@+id/buttonDonateNow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Donasi Sekarang"
+            android:backgroundTint="@color/button_primary"
+            android:textColor="@color/button_primary_text"
+            android:fontFamily="@font/opensans_semibold"
+            app:cornerRadius="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewCollectedAmount"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:clickable="true"    android:focusable="true"    android:onClick="onDonateButtonClick" /> </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
