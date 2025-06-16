@@ -10,7 +10,7 @@ public class Donasi {
     private String date;
     private String status;
     private String paymentMethod;
-    private String proofImagePath; // Tambah ini
+    private String proofImagePath;
 
     public Donasi(int id, String projectTitle, double amount, String date, String status, String paymentMethod, String proofImagePath) {
         this.id = id;

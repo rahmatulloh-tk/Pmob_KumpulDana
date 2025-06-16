@@ -7,8 +7,8 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.View;
-import android.widget.ImageView; // Tambahkan import ini
-import android.widget.TextView; // Tambahkan import ini
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Context;
 
@@ -26,8 +26,8 @@ public class RiwayatDonasiActivity extends AppCompatActivity {
     private List<UserDonation> riwayatDonasiList;
     private DatabaseHelper dbHelper;
     private int currentLoggedInUserId;
-    private ImageView backButtonRiwayat; // Deklarasikan ImageView untuk tombol kembali
-    private TextView textViewNoDonations; // Deklarasikan TextView untuk pesan 'tidak ada donasi'
+    private ImageView backButtonRiwayat;
+    private TextView textViewNoDonations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +37,8 @@ public class RiwayatDonasiActivity extends AppCompatActivity {
         recyclerViewRiwayatDonasi = findViewById(R.id.recyclerViewRiwayatDonasi);
         recyclerViewRiwayatDonasi.setLayoutManager(new LinearLayoutManager(this));
 
-        backButtonRiwayat = findViewById(R.id.backButtonRiwayat); // Inisialisasi tombol kembali
-        textViewNoDonations = findViewById(R.id.textViewNoDonations); // Inisialisasi TextView
+        backButtonRiwayat = findViewById(R.id.backButtonRiwayat);
+        textViewNoDonations = findViewById(R.id.textViewNoDonations);
 
         dbHelper = new DatabaseHelper(this);
 
@@ -64,12 +64,12 @@ public class RiwayatDonasiActivity extends AppCompatActivity {
             riwayatDonasiList = dbHelper.getDonationsByUserIdWithProjectTitle(currentLoggedInUserId);
 
             if (riwayatDonasiList.isEmpty()) {
-                textViewNoDonations.setVisibility(View.VISIBLE); // Tampilkan pesan
-                recyclerViewRiwayatDonasi.setVisibility(View.GONE); // Sembunyikan RecyclerView
+                textViewNoDonations.setVisibility(View.VISIBLE);
+                recyclerViewRiwayatDonasi.setVisibility(View.GONE);
                 Toast.makeText(this, "Anda belum memiliki riwayat donasi.", Toast.LENGTH_SHORT).show();
             } else {
-                textViewNoDonations.setVisibility(View.GONE); // Sembunyikan pesan
-                recyclerViewRiwayatDonasi.setVisibility(View.VISIBLE); // Tampilkan RecyclerView
+                textViewNoDonations.setVisibility(View.GONE);
+                recyclerViewRiwayatDonasi.setVisibility(View.VISIBLE);
                 if (donasiAdapter != null) {
                     donasiAdapter.updateData(riwayatDonasiList);
                 } else {

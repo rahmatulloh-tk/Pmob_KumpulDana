@@ -3,7 +3,7 @@ package com.example.kumpul_dana.ui;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log; // Tambahkan import ini untuk Log
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,15 +53,13 @@ public class RegistrasiActivity extends AppCompatActivity {
             } else if (!password.equals(confirmPassword)) {
                 Toast.makeText(RegistrasiActivity.this, "Konfirmasi Password tidak cocok!", Toast.LENGTH_SHORT).show();
             } else {
-                // Gunakan metode checkEmailExists dan checkUsernameExists terlebih dahulu
+                // metode checkEmailExists dan checkUsernameExists
                 if (dbHelper.checkEmailExists(email)) {
                     Toast.makeText(RegistrasiActivity.this, "Email sudah terdaftar. Gunakan Email lain.", Toast.LENGTH_LONG).show();
                 } else if (dbHelper.checkUsernameExists(username)) {
                     Toast.makeText(RegistrasiActivity.this, "Username sudah dipakai. Gunakan Username lain.", Toast.LENGTH_LONG).show();
                 } else {
-                    // Panggil createUser dengan urutan parameter yang BENAR
-                    // Metode createUser mengembalikan 'long' (ID baris), bukan 'boolean'
-                    long newUserId = dbHelper.createUser(username, email, mobile, password); // <<< PERBAIKAN DI SINI
+                    long newUserId = dbHelper.createUser(username, email, mobile, password);
 
                     Log.d("RegistrasiActivity", "Attempted to create user. Result ID: " + newUserId);
 

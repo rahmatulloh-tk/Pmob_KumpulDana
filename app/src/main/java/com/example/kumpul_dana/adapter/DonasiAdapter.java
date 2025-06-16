@@ -41,11 +41,11 @@ public class DonasiAdapter extends RecyclerView.Adapter<DonasiAdapter.DonasiView
         String formattedAmount = formatRupiah.format(donation.getAmount());
 
         holder.textViewTanggalDonasi.setText(donation.getDonationDate());
-        holder.textViewStatusDonasi.setText(donation.getStatus()); // Set status donasi
-        holder.textViewJudulProyek.setText(donation.getProjectTitle()); // Set judul proyek
-        holder.textViewDeskripsiProyek.setText(donation.getProjectDescription()); // Set deskripsi proyek
-        holder.textViewDanaDidonasikan.setText(formattedAmount); // Set jumlah donasi
-        holder.textViewPembayaranVia.setText("(pembayaran via " + donation.getPaymentMethod() + ")"); // Set metode pembayaran
+        holder.textViewStatusDonasi.setText(donation.getStatus());
+        holder.textViewJudulProyek.setText(donation.getProjectTitle());
+        holder.textViewDeskripsiProyek.setText(donation.getProjectDescription());
+        holder.textViewDanaDidonasikan.setText(formattedAmount);
+        holder.textViewPembayaranVia.setText("(pembayaran via " + donation.getPaymentMethod() + ")");
     }
 
     @Override

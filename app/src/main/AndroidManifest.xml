@@ -30,9 +30,12 @@
         <activity android:name=".ui.BuatDonasiActivity" android:exported="false" />
         <activity android:name=".ui.PembayaranQrisActivity" android:exported="false" />
         <activity android:name=".ui.UploadBuktiActivity" android:exported="false" />
+        <activity android:name=".ui.TopUpSaldoActivity" android:exported="false" />
         <activity android:name=".admin.AdminDashboardActivity" android:exported="false"/>
         <activity android:name=".admin.ProjectActivity" android:exported="false"/>
         <activity android:name=".admin.AddEditProjectActivity" android:exported="false"/>
+        <activity android:name=".admin.AdminDonationHistoryActivity" android:exported="false"/>
+        <activity android:name=".admin.UserManagementActivity" android:exported="false"/>
 
 
     </application>

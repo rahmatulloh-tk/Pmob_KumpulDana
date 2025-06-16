@@ -1,4 +1,3 @@
-// File: AddEditProjectActivity.java
 package com.example.kumpul_dana.admin;
 
 import android.app.DatePickerDialog;
@@ -21,10 +20,10 @@ import com.example.kumpul_dana.R;
 import com.example.kumpul_dana.database.DatabaseHelper;
 import com.example.kumpul_dana.model.Project;
 
-import java.text.ParseException; // Import untuk ParseException
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date; // Import untuk Date
+import java.util.Date;
 import java.util.Locale;
 
 public class AddEditProjectActivity extends AppCompatActivity {
@@ -66,13 +65,10 @@ public class AddEditProjectActivity extends AppCompatActivity {
         buttonDeleteProject = findViewById(R.id.buttonDeleteProject);
         layoutImageUpload = findViewById(R.id.layoutImageUpload);
 
-        // Tangani klik pada area upload gambar
         layoutImageUpload.setOnClickListener(v -> openImageChooser());
 
-        // Tangani klik pada EditText Deadline untuk menampilkan DatePicker
         editTextProjectDeadline.setOnClickListener(v -> showDatePickerDialog());
 
-        // Cek apakah ini mode edit atau tambah baru
         Intent intent = getIntent();
         projectId = intent.getIntExtra("PROJECT_ID", -1);
         isEditMode = (projectId != -1);
@@ -99,7 +95,7 @@ public class AddEditProjectActivity extends AppCompatActivity {
             editTextProjectDescription.setText(project.getDescription());
             editTextProjectTargetAmount.setText(String.format(Locale.getDefault(), "%.0f", project.getTargetAmount()));
 
-            // Ambil deadline yang tersimpan (format yyyy-MM-dd) dari objek Project
+            // Ambil deadline yang tersimpan
             String storedDeadline = project.getTimeLeft();
             // Format ulang untuk ditampilkan di EditText (dd MMMM yyyy)
             SimpleDateFormat storedFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -113,7 +109,7 @@ public class AddEditProjectActivity extends AppCompatActivity {
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
-                editTextProjectDeadline.setText("Tanggal tidak valid"); // Tangani jika ada kesalahan parsing
+                editTextProjectDeadline.setText("Tanggal tidak valid");
             }
 
             if (project.getImagePath() != null && !project.getImagePath().isEmpty()) {
@@ -134,7 +130,7 @@ public class AddEditProjectActivity extends AppCompatActivity {
         String title = editTextProjectTitle.getText().toString().trim();
         String description = editTextProjectDescription.getText().toString().trim();
         String targetAmountStr = editTextProjectTargetAmount.getText().toString().trim();
-        String deadlineDisplayStr = editTextProjectDeadline.getText().toString().trim(); // Ini adalah "dd MMMM yyyy"
+        String deadlineDisplayStr = editTextProjectDeadline.getText().toString().trim();
         String imagePath = (selectedImageUri != null) ? selectedImageUri.toString() : "";
 
         if (title.isEmpty() || description.isEmpty() || targetAmountStr.isEmpty() || deadlineDisplayStr.isEmpty()) {
@@ -150,16 +146,13 @@ public class AddEditProjectActivity extends AppCompatActivity {
             return;
         }
 
-        // --- Perubahan Penting di Sini: Konversi format tanggal untuk penyimpanan ---
         String deadlineToStore;
-        // Format yang ditampilkan di EditText
         SimpleDateFormat displayFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
-        // Format yang akan disimpan di database
         SimpleDateFormat storedFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         try {
             Date parsedDate = displayFormat.parse(deadlineDisplayStr);
             if (parsedDate != null) {
-                deadlineToStore = storedFormat.format(parsedDate); // Konversi ke format yyyy-MM-dd
+                deadlineToStore = storedFormat.format(parsedDate);
             } else {
                 Toast.makeText(this, "Format tanggal tidak valid. Mohon pilih ulang tanggal.", Toast.LENGTH_SHORT).show();
                 return;
@@ -169,12 +162,12 @@ public class AddEditProjectActivity extends AppCompatActivity {
             Toast.makeText(this, "Kesalahan parsing tanggal. Mohon pilih ulang tanggal.", Toast.LENGTH_SHORT).show();
             return;
         }
-        // --- Akhir Perubahan Penting ---
+
 
         Project project;
         if (isEditMode) {
             // Untuk mode edit, gunakan ID yang sudah ada
-            project = new Project(projectId, title, description, imagePath, 0.0, targetAmount, deadlineToStore); // Kirim deadlineToStore
+            project = new Project(projectId, title, description, imagePath, 0.0, targetAmount, deadlineToStore);
             boolean updated = databaseHelper.updateProject(project);
             if (updated) {
                 Toast.makeText(this, "Proyek berhasil diperbarui.", Toast.LENGTH_SHORT).show();
@@ -185,7 +178,7 @@ public class AddEditProjectActivity extends AppCompatActivity {
             }
         } else {
             // Untuk mode tambah baru
-            long newId = databaseHelper.insertProject(title, description, imagePath, targetAmount, deadlineToStore); // Kirim deadlineToStore
+            long newId = databaseHelper.insertProject(title, description, imagePath, targetAmount, deadlineToStore);
             if (newId != -1) {
                 Toast.makeText(this, "Proyek berhasil ditambahkan.", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);

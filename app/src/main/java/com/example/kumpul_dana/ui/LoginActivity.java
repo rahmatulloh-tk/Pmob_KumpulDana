@@ -11,13 +11,13 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.kumpul_dana.R;
-import com.example.kumpul_dana.database.DatabaseHelper; // Pastikan ini benar
-import com.example.kumpul_dana.admin.AdminDashboardActivity; // <<< IMPORT INI UNTUK ADMIN DASHBOARD
-import com.example.kumpul_dana.ui.HomeActivity; // <<< Sesuaikan jika HomeActivity Anda di package lain
+import com.example.kumpul_dana.database.DatabaseHelper;
+import com.example.kumpul_dana.admin.AdminDashboardActivity;
+import com.example.kumpul_dana.ui.HomeActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private TextInputEditText editTextIdentifier; // Ganti nama agar lebih umum (username/email)
+    private TextInputEditText editTextIdentifier;
     private TextInputEditText editTextPassword;
     private Button buttonLogin;
     private TextView textViewCreateAccount;
@@ -31,14 +31,14 @@ public class LoginActivity extends AppCompatActivity {
 
         dbHelper = new DatabaseHelper(this);
 
-        editTextIdentifier = findViewById(R.id.editTextUsername); // Sesuaikan ID ini di layout Anda
+        editTextIdentifier = findViewById(R.id.editTextUsername);
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
-        textViewCreateAccount = findViewById(R.id.textViewCreateAccount); // Sesuaikan ID ini
+        textViewCreateAccount = findViewById(R.id.textViewCreateAccount);
 
         buttonLogin.setOnClickListener(v -> {
-            String identifier = editTextIdentifier.getText().toString().trim(); // Ambil input username/email
-            String password = editTextPassword.getText().toString().trim();   // Ambil input password
+            String identifier = editTextIdentifier.getText().toString().trim();
+            String password = editTextPassword.getText().toString().trim();
 
             if (identifier.isEmpty()) {
                 editTextIdentifier.setError("Username atau Email tidak boleh kosong");
@@ -71,22 +71,21 @@ public class LoginActivity extends AppCompatActivity {
                 if (role.equals("admin")) {
                     // Redirect ke Admin Dashboard
                     Intent intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
-                    intent.putExtra("USER_ID", userId); // Teruskan user ID jika diperlukan di AdminDashboard
+                    intent.putExtra("USER_ID", userId);
                     startActivity(intent);
                     finish(); // Tutup LoginActivity
                 } else if (role.equals("user")) {
                     // Redirect ke User Home
-                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class); // Sesuaikan dengan HomeActivity Anda
-                    intent.putExtra("USER_ID", userId); // Teruskan user ID
+                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                    intent.putExtra("USER_ID", userId);
                     startActivity(intent);
                     finish(); // Tutup LoginActivity
                 } else {
-                    // Seharusnya tidak terjadi jika role hanya 'admin' atau 'user'
                     Toast.makeText(LoginActivity.this, "Peran pengguna tidak dikenal.", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Toast.makeText(LoginActivity.this, "Username/Email atau Password salah.", Toast.LENGTH_SHORT).show();
-                editTextPassword.setText(""); // Kosongkan password field
+                editTextPassword.setText("");
             }
         });
 

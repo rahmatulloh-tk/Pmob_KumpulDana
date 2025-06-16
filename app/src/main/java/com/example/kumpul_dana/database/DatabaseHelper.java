@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import com.example.kumpul_dana.model.Project;
 import com.example.kumpul_dana.model.UserDonation;
-import com.example.kumpul_dana.R; // Pastikan ini diimport, asumsi R.drawable.project_1 ada
+import com.example.kumpul_dana.R;
 import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
@@ -17,9 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DatabaseHelper";
     private static final String DATABASE_NAME = "kumpul_dana.db";
-    // PENTING: UBAH VERSI DATABASE INI KE 4 ATAU LEBIH TINGGI DARI VERSI SEBELUMNYA
-    // Agar onCreate/onUpgrade terpanggil dan kolom 'role' ditambahkan.
-    private static final int DATABASE_VERSION = 4; // <<< UBAH INI (Jika sebelumnya 3, naikkan jadi 4)
+    private static final int DATABASE_VERSION = 5; // <--- UPDATE KE VERSI 5 (ATAU LEBIH TINGGI)
 
     // Tabel Pengguna
     public static final String TABLE_USERS = "users";
@@ -28,7 +26,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_PHONE = "phone";
     public static final String COLUMN_PASSWORD = "password";
-    public static final String COLUMN_USER_ROLE = "role"; // Kolom role untuk admin/user
+    public static final String COLUMN_USER_ROLE = "role";
+    public static final String COLUMN_USER_BALANCE = "balance"; // <--- KOLOM BARU UNTUK SALDO
 
     // Tabel Proyek Donasi
     public static final String TABLE_PROJECTS = "projects";
@@ -47,22 +46,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DONATION_PROJECT_ID = "project_id";
     public static final String COLUMN_DONATION_AMOUNT = "amount";
     public static final String COLUMN_DONATION_DATE = "donation_date";
-    public static final String COLUMN_DONATION_STATUS = "status"; // misal: "Pending", "Diverifikasi", "Ditolak"
+    public static final String COLUMN_DONATION_STATUS = "status";
     public static final String COLUMN_PAYMENT_METHOD = "payment_method";
     public static final String COLUMN_PROOF_IMAGE_PATH = "proof_image_path";
 
 
-    // SQL untuk membuat tabel pengguna (SUDAH DIUBAH)
+    // SQL untuk membuat tabel pengguna (DITAMBAH KOLOM BALANCE)
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS + "(" +
             COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             COLUMN_USERNAME + " TEXT UNIQUE," +
             COLUMN_EMAIL + " TEXT UNIQUE," +
             COLUMN_PHONE + " TEXT," +
             COLUMN_PASSWORD + " TEXT NOT NULL," +
-            COLUMN_USER_ROLE + " TEXT DEFAULT 'user'" + // Kolom role ditambahkan dengan default 'user'
+            COLUMN_USER_ROLE + " TEXT DEFAULT 'user'," +
+            COLUMN_USER_BALANCE + " REAL DEFAULT 0.0" + // <--- PENAMBAHAN KOLOM SALDO
             ")";
 
-    // SQL untuk membuat tabel proyek (Tidak Berubah)
+    // SQL untuk membuat tabel proyek (Tidak ada perubahan di sini)
     private static final String CREATE_TABLE_PROJECTS = "CREATE TABLE " + TABLE_PROJECTS + "(" +
             COLUMN_PROJECT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             COLUMN_PROJECT_TITLE + " TEXT NOT NULL," +
@@ -73,7 +73,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_PROJECT_TIME_LEFT + " TEXT" +
             ")";
 
-    // SQL untuk membuat tabel donasi (Tidak Berubah)
+    // SQL untuk membuat tabel donasi (Tidak ada perubahan di sini)
     private static final String CREATE_TABLE_DONATIONS = "CREATE TABLE " + TABLE_DONATIONS + "(" +
             COLUMN_DONATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             COLUMN_DONATION_USER_ID + " INTEGER," +
@@ -101,19 +101,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_DONATIONS);
         Log.d(TAG, "All tables created successfully.");
 
-        addInitialProjects(db); // Tambahkan proyek awal
-        addDummyUser(db); // Tambahkan user dummy
-        addDummyAdmin(db); // Tambahkan admin dummy
+        addInitialProjects(db);
+        addDummyUser(db);
+        addDummyAdmin(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
-        // Penting: Hapus tabel dalam urutan yang benar jika ada FOREIGN KEY
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_DONATIONS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROJECTS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS); // Tabel users terakhir karena direferensikan
-        onCreate(db); // Buat ulang semua tabel
+        // Jika hanya menambah kolom, disarankan ALTER TABLE.
+        // Karena tugas tidak mau rumit dan sering reset DB, DROP dan CREATE ulang bisa diterima
+        // TAPI INGAT: Ini akan menghapus SEMUA data saat update versi DB!
+        // Jika ingin data tetap, Anda harus melakukan ALTER TABLE, bukan DROP.
+        if (oldVersion < 5) { // Misalnya dari versi 4 ke 5
+            Log.d(TAG, "Adding COLUMN_USER_BALANCE to " + TABLE_USERS);
+            // Tambahkan kolom 'balance' jika belum ada
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_USER_BALANCE + " REAL DEFAULT 0.0;");
+        }
+        // Contoh untuk upgrade yang lebih komprehensif, tapi ini akan menghapus data:
+        // db.execSQL("DROP TABLE IF EXISTS " + TABLE_DONATIONS);
+        // db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROJECTS);
+        // db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        // onCreate(db);
     }
 
     // --- Metode untuk Pengguna & Admin Login ---
@@ -125,7 +134,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_EMAIL, email);
         values.put(COLUMN_PHONE, phone);
         values.put(COLUMN_PASSWORD, password);
-        values.put(COLUMN_USER_ROLE, "user"); // Default role saat membuat user baru
+        values.put(COLUMN_USER_ROLE, "user");
+        values.put(COLUMN_USER_BALANCE, 0.0); // <--- INISIALISASI SALDO 0 UNTUK USER BARU
 
         long id = db.insert(TABLE_USERS, null, values);
         db.close();
@@ -133,7 +143,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    // Metode baru untuk mendapatkan role pengguna setelah login berhasil
     public String getUserRole(String identifier, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -145,7 +154,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             cursor = db.query(
                     TABLE_USERS,
-                    new String[]{COLUMN_USER_ID, COLUMN_USER_ROLE}, // Ambil ID dan ROLE
+                    new String[]{COLUMN_USER_ID, COLUMN_USER_ROLE},
                     selection,
                     selectionArgs,
                     null, null, null
@@ -165,10 +174,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
             db.close();
         }
-        return userRole; // Mengembalikan 'admin', 'user', atau null jika gagal login
+        return userRole;
     }
 
-    // Metode baru untuk mendapatkan User ID setelah login berhasil
     public int getUserId(String identifier, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -275,14 +283,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return exists;
     }
 
-    // Metode untuk menambahkan dummy user
+    // Metode untuk menambahkan dummy user (DITAMBAH INISIALISASI SALDO)
     private void addDummyUser(SQLiteDatabase db) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_USERNAME, "testuser");
         values.put(COLUMN_EMAIL, "test@example.com");
         values.put(COLUMN_PHONE, "081234567890");
         values.put(COLUMN_PASSWORD, "password123");
-        values.put(COLUMN_USER_ROLE, "user"); // Tetapkan role default 'user'
+        values.put(COLUMN_USER_ROLE, "user");
+        values.put(COLUMN_USER_BALANCE, 50000.0);
         long id = db.insert(TABLE_USERS, null, values);
         if (id != -1) {
             Log.d(TAG, "Dummy user added with ID: " + id);
@@ -291,14 +300,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    // Metode untuk menambahkan dummy admin
+    // Metode untuk menambahkan dummy admin (DITAMBAH INISIALISASI SALDO)
     private void addDummyAdmin(SQLiteDatabase db) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_USERNAME, "admin");
         values.put(COLUMN_EMAIL, "admin@kumpuldana.com");
         values.put(COLUMN_PHONE, "081122334455");
-        values.put(COLUMN_PASSWORD, "admin123"); // Password sederhana untuk testing
-        values.put(COLUMN_USER_ROLE, "admin"); // Set role sebagai 'admin'
+        values.put(COLUMN_PASSWORD, "admin123");
+        values.put(COLUMN_USER_ROLE, "admin");
+        values.put(COLUMN_USER_BALANCE, 0.0); // <--- Admin tidak punya saldo
         long id = db.insert(TABLE_USERS, null, values);
         if (id != -1) {
             Log.d(TAG, "Dummy admin added with ID: " + id);
@@ -308,8 +318,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // --- Metode untuk Proyek ---
-
-    // Metode ini hanya dipanggil dari onCreate, jadi private dan menerima db
     private long insertProjectInternal(SQLiteDatabase db, String title, String description, String imagePath, double targetAmount, double collectedAmount, String timeLeft) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_PROJECT_TITLE, title);
@@ -323,7 +331,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    // Metode ini untuk menambahkan proyek baru dari AddEditProjectActivity
     public long insertProject(String title, String description, String imagePath, double targetAmount, String timeLeft) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -331,10 +338,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_PROJECT_DESCRIPTION, description);
         values.put(COLUMN_PROJECT_IMAGE_PATH, imagePath);
         values.put(COLUMN_PROJECT_TARGET_AMOUNT, targetAmount);
-        values.put(COLUMN_PROJECT_COLLECTED_AMOUNT, 0.0); // Proyek baru selalu mulai dari 0
+        values.put(COLUMN_PROJECT_COLLECTED_AMOUNT, 0.0);
         values.put(COLUMN_PROJECT_TIME_LEFT, timeLeft);
         long id = db.insert(TABLE_PROJECTS, null, values);
-        db.close(); // Tutup database setelah operasi selesai
+        db.close();
         Log.d(TAG, "Inserted project (public): " + title + " with ID: " + id);
         return id;
     }
@@ -342,13 +349,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void addInitialProjects(SQLiteDatabase db) {
         String packageName = context.getPackageName();
 
-        // Menggunakan resource ID secara langsung, bukan path string
-        long projectId1 = insertProjectInternal(db, "Bantuan Korban Banjir", "Membantu korban banjir yang kehilangan tempat tinggal dan harta benda yang membutuhkan bantuan secepatnya.",
-                "android.resource://" + packageName + "/" + R.drawable.project_1, 5000000.0, 0.0, "15 hari lagi");
-        long projectId2 = insertProjectInternal(db, "Beasiswa Anak Yatim", "Memberikan beasiswa pendidikan untuk anak-anak yatim piatu agar mereka bisa meraih cita-cita dan memiliki masa depan yang cerah.",
-                "android.resource://" + packageName + "/" + R.drawable.project_1, 10000000.0, 0.0, "30 hari lagi");
-        long projectId3 = insertProjectInternal(db, "Pembangunan Masjid Desa", "Mengumpulkan dana untuk pembangunan masjid di desa terpencil yang membutuhkan tempat ibadah layak dan pusat komunitas.",
-                "android.resource://" + packageName + "/" + R.drawable.project_1, 25000000.0, 0.0, "60 hari lagi");
+        long projectId1 = insertProjectInternal(db, "Penanaman Hutan Papua", "Membantu penanaman hutan papua yang gundul untuk menjaga kelestarian alam.",
+                "android.resource://" + packageName + "/" + R.drawable.hutan_papua, 10000000.0, 900000.0, "2025-12-31");
+        long projectId2 = insertProjectInternal(db, "Donasi Buku untuk Perpustakaan Keliling", "Proyek Anniv NCTZen membantu perbaikan perpustakaan keliling.",
+                "android.resource://" + packageName + "/" + R.drawable.donasi_buku, 2000000.0, 1500000.0, "2026-01-15");
+        long projectId3 = insertProjectInternal(db, "Steril Kucing Massal", "Mengumpulkan dana untuk steril kucing liar massal di daerah Surabaya.",
+                "android.resource://" + packageName + "/" + R.drawable.steril_kucing, 12000000.0, 100000.0, "2026-03-01");
 
         if (projectId1 != -1) Log.d(TAG, "Initial project 1 added.");
         if (projectId2 != -1) Log.d(TAG, "Initial project 2 added.");
@@ -363,7 +369,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             cursor = db.query(
                     TABLE_PROJECTS,
-                    null, // Semua kolom
+                    null,
                     null, null, null, null, null
             );
 
@@ -388,7 +394,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.close();
             }
-            db.close(); // Tutup database setelah selesai
+            db.close();
         }
         return projectList;
     }
@@ -468,8 +474,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         long id = db.insert(TABLE_DONATIONS, null, values);
 
         if (id != -1) {
-            // Setelah donasi dicatat, perbarui jumlah terkumpul di tabel proyek
-            boolean updatedProject = updateProjectCollectedAmount(db, projectId, amount); // db_instance passed
+            boolean updatedProject = updateProjectCollectedAmount(db, projectId, amount);
+            // Tambahkan juga pengurangan saldo user di sini jika donasi langsung dari saldo
+            // Misal: boolean updatedBalance = decreaseUserBalance(db, userId, amount);
             if (updatedProject) {
                 Log.d(TAG, "Donation created with ID: " + id + " and project collected amount updated for project ID: " + projectId);
             } else {
@@ -479,11 +486,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e(TAG, "Failed to create donation.");
         }
 
-        db.close(); // Tutup database setelah operasi selesai
+        db.close();
         return id;
     }
 
-    // Metode untuk mendapatkan daftar donasi pengguna beserta judul dan deskripsi proyek terkait
     public List<UserDonation> getDonationsByUserIdWithProjectTitle(int userId) {
         List<UserDonation> donationList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -549,7 +555,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return donationList;
     }
 
-    // Metode ini hanya dipanggil dari createDonation, dan menerima db yang sudah terbuka
     private boolean updateProjectCollectedAmount(SQLiteDatabase db, int projectId, double amountToAdd) {
         double currentCollectedAmount = 0;
         Cursor cursor = null;
@@ -572,7 +577,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.close();
             }
-            // Jangan menutup DB di sini, karena DB dikelola oleh pemanggil (createDonation)
         }
 
         ContentValues values = new ContentValues();
@@ -586,15 +590,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public int getTotalDonationsForUser(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        // ... (sisanya dari metode ini jika ada, pastikan ditutup db-nya)
-        // Contoh implementasi untuk getTotalDonationsForUser:
         int totalDonations = 0;
         Cursor cursor = null;
         try {
             String query = "SELECT COUNT(*) FROM " + TABLE_DONATIONS + " WHERE " + COLUMN_DONATION_USER_ID + " = ?";
             cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
             if (cursor != null && cursor.moveToFirst()) {
-                totalDonations = cursor.getInt(0); // Ambil nilai dari kolom pertama (COUNT)
+                totalDonations = cursor.getInt(0);
             }
         } catch (Exception e) {
             Log.e(TAG, "Error getting total donations for user: " + e.getMessage());
@@ -606,4 +608,249 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return totalDonations;
     }
+
+    // --- NEW: Metode untuk Saldo Pengguna ---
+
+    // Metode untuk mendapatkan saldo user
+    public double getUserBalance(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double balance = 0.0;
+        Cursor cursor = null;
+        try {
+            String query = "SELECT " + COLUMN_USER_BALANCE + " FROM " + TABLE_USERS + " WHERE " + COLUMN_USER_ID + " = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                int balanceIndex = cursor.getColumnIndex(COLUMN_USER_BALANCE);
+                if (balanceIndex != -1) {
+                    balance = cursor.getDouble(balanceIndex);
+                    Log.d(TAG, "User ID " + userId + " balance: " + balance);
+                } else {
+                    Log.e(TAG, "Kolom '" + COLUMN_USER_BALANCE + "' tidak ditemukan di tabel " + TABLE_USERS + ".");
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting user balance for ID " + userId + ": " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return balance;
+    }
+
+    // Metode untuk mengupdate saldo user (bisa untuk top-up atau pengurangan)
+    public boolean updateUserBalance(int userId, double amount) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_BALANCE, amount); // Mengupdate saldo menjadi nilai 'amount' yang diberikan
+
+        int rowsAffected = db.update(TABLE_USERS, values, COLUMN_USER_ID + " = ?", new String[]{String.valueOf(userId)});
+        db.close();
+        if (rowsAffected > 0) {
+            Log.d(TAG, "Updated user ID " + userId + " balance to: " + amount);
+        } else {
+            Log.e(TAG, "Failed to update user ID " + userId + " balance.");
+        }
+        return rowsAffected > 0;
+    }
+
+    // Metode untuk menambah saldo user (top-up)
+    public boolean addBalance(int userId, double amountToAdd) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        double currentBalance = getUserBalance(userId); // Dapatkan saldo saat ini (memanggil fungsi yang akan menutup DB)
+        // Buka kembali database untuk operasi update
+        db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_BALANCE, currentBalance + amountToAdd);
+
+        int rowsAffected = db.update(TABLE_USERS, values, COLUMN_USER_ID + " = ?", new String[]{String.valueOf(userId)});
+        db.close();
+        if (rowsAffected > 0) {
+            Log.d(TAG, "Added " + amountToAdd + " to user ID " + userId + ". New balance: " + (currentBalance + amountToAdd));
+        } else {
+            Log.e(TAG, "Failed to add balance to user ID " + userId + ".");
+        }
+        return rowsAffected > 0;
+    }
+
+    // Metode untuk mengurangi saldo user (donasi via saldo)
+    public boolean decreaseBalance(int userId, double amountToDecrease) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        double currentBalance = getUserBalance(userId); // Dapatkan saldo saat ini
+        // Buka kembali database untuk operasi update
+        db = this.getWritableDatabase();
+
+        if (currentBalance >= amountToDecrease) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_USER_BALANCE, currentBalance - amountToDecrease);
+
+            int rowsAffected = db.update(TABLE_USERS, values, COLUMN_USER_ID + " = ?", new String[]{String.valueOf(userId)});
+            db.close();
+            if (rowsAffected > 0) {
+                Log.d(TAG, "Decreased " + amountToDecrease + " from user ID " + userId + ". New balance: " + (currentBalance - amountToDecrease));
+            } else {
+                Log.e(TAG, "Failed to decrease balance from user ID " + userId + ".");
+            }
+            return rowsAffected > 0;
+        } else {
+            Log.w(TAG, "Insufficient balance for user ID " + userId + ". Current: " + currentBalance + ", Attempted to decrease: " + amountToDecrease);
+            db.close();
+            return false; // Saldo tidak cukup
+        }
+    }
+
+    public boolean checkUserPassword(int userId, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        boolean passwordCorrect = false;
+        try {
+            String query = "SELECT " + COLUMN_PASSWORD + " FROM " + TABLE_USERS + " WHERE " + COLUMN_USER_ID + " = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                String storedPassword = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PASSWORD));
+                if (storedPassword.equals(password)) { // Perbandingan langsung, untuk tugas oke
+                    passwordCorrect = true;
+                    Log.d(TAG, "Password for user ID " + userId + " is correct.");
+                } else {
+                    Log.d(TAG, "Password for user ID " + userId + " is incorrect.");
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking user password: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return passwordCorrect;
+    }
+    // Mengambil semua donasi (untuk Riwayat Donasi Admin)
+    public List<UserDonation> getAllDonationsWithProjectAndUserInfo() {
+        List<UserDonation> donationList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            String query = "SELECT " +
+                    "D." + COLUMN_DONATION_ID + ", " +
+                    "D." + COLUMN_DONATION_USER_ID + ", " +
+                    "U." + COLUMN_USERNAME + ", " + // Tambahkan username
+                    "D." + COLUMN_DONATION_PROJECT_ID + ", " +
+                    "P." + COLUMN_PROJECT_TITLE + ", " + // Tambahkan judul proyek
+                    "D." + COLUMN_DONATION_AMOUNT + ", " +
+                    "D." + COLUMN_DONATION_DATE + ", " +
+                    "D." + COLUMN_DONATION_STATUS + ", " +
+                    "D." + COLUMN_PAYMENT_METHOD + ", " +
+                    "D." + COLUMN_PROOF_IMAGE_PATH +
+                    " FROM " + TABLE_DONATIONS + " AS D" +
+                    " INNER JOIN " + TABLE_USERS + " AS U ON D." + COLUMN_DONATION_USER_ID + " = U." + COLUMN_USER_ID +
+                    " INNER JOIN " + TABLE_PROJECTS + " AS P ON D." + COLUMN_DONATION_PROJECT_ID + " = P." + COLUMN_PROJECT_ID +
+                    " ORDER BY D." + COLUMN_DONATION_DATE + " DESC"; // Urutkan berdasarkan tanggal terbaru
+
+            cursor = db.rawQuery(query, null); // Tidak ada selectionArgs karena mengambil semua
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    int donationId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DONATION_ID));
+                    int userId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DONATION_USER_ID));
+                    String username = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USERNAME)); // Ambil username
+                    int projectId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DONATION_PROJECT_ID));
+                    String projectTitle = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PROJECT_TITLE)); // Ambil judul proyek
+                    double amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_DONATION_AMOUNT));
+                    String donationDate = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DONATION_DATE));
+                    String status = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DONATION_STATUS));
+                    String paymentMethod = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAYMENT_METHOD));
+                    String proofImagePath = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PROOF_IMAGE_PATH));
+
+                    // Perlu model UserDonation yang bisa menampung username dan projectTitle
+                    // Jika model UserDonation yang sudah ada tidak punya ini, kita akan perlu menyesuaikan
+                    // atau membuat model baru untuk admin view. Untuk sementara, kita asumsikan UserDonation
+                    // bisa menampung projectTitle. Tambahkan username juga di konstruktor UserDonation
+                    // atau gunakan UserDonation versi lain / Map.
+
+                    // Untuk sekarang, kita akan tambahkan ke UserDonation.
+                    // Pastikan model UserDonation Anda diperbarui untuk menampung `username` (opsional)
+                    // dan `projectTitle` (sudah ada).
+
+                    UserDonation userDonation = new UserDonation(
+                            donationId,
+                            userId,
+                            projectId,
+                            projectTitle, // Sudah ada
+                            null, // projectDescription - tidak diambil di query ini, bisa diisi null atau ambil jika perlu
+                            amount,
+                            donationDate,
+                            status,
+                            paymentMethod,
+                            proofImagePath
+                    );
+                    // Jika Anda ingin menampilkan username, Anda perlu menambahkan setter di model UserDonation
+                    // atau membuat konstruktor/model khusus untuk admin view.
+                    // Contoh: userDonation.setUsername(username);
+                    donationList.add(userDonation);
+                } while (cursor.moveToNext());
+            }
+            Log.d(TAG, "Fetched " + donationList.size() + " total donations from database.");
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting all donations for admin: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return donationList;
+    }
+
+    // Mengambil semua user (untuk Manajemen Pengguna Admin)
+    public List<String[]> getAllUsersData() {
+        List<String[]> userList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            // Ambil ID, Username, Email, Phone, Role, dan Balance
+            String query = "SELECT " +
+                    COLUMN_USER_ID + ", " +
+                    COLUMN_USERNAME + ", " +
+                    COLUMN_EMAIL + ", " +
+                    COLUMN_PHONE + ", " +
+                    COLUMN_USER_ROLE + ", " +
+                    COLUMN_USER_BALANCE +
+                    " FROM " + TABLE_USERS +
+                    " ORDER BY " + COLUMN_USERNAME + " ASC";
+
+            cursor = db.rawQuery(query, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    // Masukkan data ke array string, atau buat model User jika ada
+                    String id = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_ID));
+                    String username = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USERNAME));
+                    String email = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL));
+                    String phone = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE));
+                    String role = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_ROLE));
+                    double balance = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_USER_BALANCE));
+
+                    // Untuk kesederhanaan, kembalikan String[]
+                    // Jika Anda memiliki model User, lebih baik mengembalikan List<User>
+                    userList.add(new String[]{id, username, email, phone, role, String.valueOf(balance)});
+                } while (cursor.moveToNext());
+            }
+            Log.d(TAG, "Fetched " + userList.size() + " total users from database.");
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting all users for admin: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return userList;
+    }
+
 }

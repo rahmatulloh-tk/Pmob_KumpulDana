@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:contentPadding="12dp"
+    android:backgroundTint="@color/card_background">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textViewUserId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ID: #1"
+            android:textColor="@color/text_dark"
+            android:textSize="12sp"
+            android:fontFamily="@font/opensans_regular"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textViewUserRole"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Role: user"
+            android:textColor="@color/text_dark"
+            android:textSize="12sp"
+            android:fontFamily="@font/opensans_regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textViewUsername"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Username: testuser"
+            android:textColor="@color/text_dark"
+            android:textSize="16sp"
+            android:fontFamily="@font/opensans_semibold"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewUserId" />
+
+        <TextView
+            android:id="@+id/textViewUserEmail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Email: test@example.com"
+            android:textColor="@color/text_dark"
+            android:textSize="14sp"
+            android:fontFamily="@font/opensans_regular"
+            android:layout_marginTop="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewUsername" />
+
+        <TextView
+            android:id="@+id/textViewUserPhone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Phone: 081234567890"
+            android:textColor="@color/text_dark"
+            android:textSize="14sp"
+            android:fontFamily="@font/opensans_regular"
+            android:layout_marginTop="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewUserEmail" />
+
+        <TextView
+            android:id="@+id/textViewUserBalance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Saldo: Rp 50.000"
+            android:textColor="@color/dark_blue"
+            android:textSize="16sp"
+            android:fontFamily="@font/opensans_bold"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewUserPhone" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

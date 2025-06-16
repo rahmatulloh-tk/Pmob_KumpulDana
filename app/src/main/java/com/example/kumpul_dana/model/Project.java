@@ -1,4 +1,3 @@
-// File: Project.java
 package com.example.kumpul_dana.model;
 
 import java.text.ParseException;
@@ -14,7 +13,7 @@ public class Project {
     private String imagePath;
     private double collectedAmount;
     private double targetAmount;
-    private String TimeLeft; // Menggunakan nama field TimeLeft untuk menyimpan tanggal deadline (yyyy-MM-dd)
+    private String TimeLeft;
 
     // Konstruktor untuk proyek baru (ID akan di-generate oleh DB)
     public Project(String title, String description, String imagePath, double collectedAmount, double targetAmount, String timeLeft) {
@@ -23,7 +22,7 @@ public class Project {
         this.imagePath = imagePath;
         this.collectedAmount = collectedAmount;
         this.targetAmount = targetAmount;
-        this.TimeLeft = timeLeft; // PERBAIKAN: Mengassign parameter 'timeLeft' ke field 'TimeLeft'
+        this.TimeLeft = timeLeft;
         this.id = 0;
     }
 
@@ -35,10 +34,9 @@ public class Project {
         this.imagePath = imagePath;
         this.collectedAmount = collectedAmount;
         this.targetAmount = targetAmount;
-        this.TimeLeft = timeLeft; // PERBAIKAN: Mengassign parameter 'timeLeft' ke field 'TimeLeft'
+        this.TimeLeft = timeLeft;
     }
 
-    // --- Getters ---
     public int getId() {
         return id;
     }
@@ -63,23 +61,21 @@ public class Project {
         return targetAmount;
     }
 
-    public String getTimeLeft() { // Getter untuk string deadline yang tersimpan (format: yyyy-MM-dd)
+    public String getTimeLeft() {
         return TimeLeft;
     }
 
     // Metode baru untuk menghitung dan mengembalikan sisa waktu yang diformat
     public String getFormattedTimeLeft() {
-        // Tentukan format tanggal yang disimpan di database (yyyy-MM-dd)
         SimpleDateFormat storedDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String formattedTimeLeft;
 
         try {
-            // PERBAIKAN SINTAKS dan penggunaan field TimeLeft
-            Date deadlineDate = storedDateFormat.parse(this.TimeLeft); // Memastikan kurung tutup ada
-            Date currentDate = new Date(); // Dapatkan tanggal saat ini
+            Date deadlineDate = storedDateFormat.parse(this.TimeLeft);
+            Date currentDate = new Date();
 
             if (deadlineDate != null) {
-                long diff = deadlineDate.getTime() - currentDate.getTime(); // Selisih dalam milidetik
+                long diff = deadlineDate.getTime() - currentDate.getTime();
 
                 if (diff <= 0) {
                     formattedTimeLeft = "Waktu Tersisa: Berakhir";
@@ -106,14 +102,11 @@ public class Project {
             }
         } catch (ParseException e) {
             e.printStackTrace();
-            // Jika ada kesalahan parsing, berarti format TimeLeft di DB tidak sesuai yyyy-MM-dd
-            // Ini akan terjadi jika data lama masih ada atau format tidak sesuai
             formattedTimeLeft = "Waktu Tersisa: N/A (Kesalahan Parsing)";
         }
         return formattedTimeLeft;
     }
 
-    // --- Setters (Jika diperlukan) ---
     public void setId(int id) {
         this.id = id;
     }
@@ -138,7 +131,7 @@ public class Project {
         this.targetAmount = targetAmount;
     }
 
-    public void setTimeLeft(String timeLeft) { // Setter untuk TimeLeft
-        this.TimeLeft = timeLeft; // PERBAIKAN: Mengassign parameter 'timeLeft' ke field 'TimeLeft'
+    public void setTimeLeft(String timeLeft) {
+        this.TimeLeft = timeLeft;
     }
 }

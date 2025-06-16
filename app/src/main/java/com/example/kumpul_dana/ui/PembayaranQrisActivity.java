@@ -14,7 +14,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment; // Tambahkan import ini
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
@@ -33,11 +33,11 @@ public class PembayaranQrisActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 100;
 
     private ImageView backButtonQris;
-    private ImageView imageViewQris; // ID ImageView untuk menampilkan QRIS
+    private ImageView imageViewQris;
     private Button buttonUnduhKode;
     private Button buttonSelanjutnyaQris;
 
-    // Data donasi yang akan diteruskan
+
     private int userId;
     private int projectId;
     private double amount;
@@ -47,20 +47,14 @@ public class PembayaranQrisActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pembayaran); // Pastikan ini layout yang benar
+        setContentView(R.layout.activity_pembayaran);
 
-        backButtonQris = findViewById(R.id.backButtonQris); // Tombol kembali di header
-        imageViewQris = findViewById(R.id.imageViewQris); // ImageView yang menampilkan gambar QRIS
+        backButtonQris = findViewById(R.id.backButtonQris);
+        imageViewQris = findViewById(R.id.imageViewQris);
         buttonUnduhKode = findViewById(R.id.buttonUnduhKode);
         buttonSelanjutnyaQris = findViewById(R.id.buttonSelanjutnyaQris);
 
-        // --- PENTING: SET GAMBAR QRIS DI SINI ---
-        // Jika gambar QRIS Anda adalah aset drawable, set di sini:
-        imageViewQris.setImageResource(R.drawable.qr); // Ganti dengan ID drawable QRIS Anda
-        // Atau jika Anda memuatnya dari tempat lain (misal URL), lakukan loading di sini.
-        // Asumsi gambar QRIS sudah muncul di imageViewQris
-        // ------------------------------------------
-
+        imageViewQris.setImageResource(R.drawable.qr);
         // Ambil data donasi dari Intent
         userId = getIntent().getIntExtra("USER_ID", -1);
         projectId = getIntent().getIntExtra("PROJECT_ID", -1);
@@ -72,15 +66,9 @@ public class PembayaranQrisActivity extends AppCompatActivity {
         backButtonQris.setOnClickListener(v -> finish());
 
         buttonUnduhKode.setOnClickListener(v -> {
-            // Periksa izin penyimpanan
-            // Sejak Android 10 (API 29), WRITE_EXTERNAL_STORAGE tidak lagi diperlukan
-            // untuk menulis ke direktori media milik aplikasi atau direktori publik tertentu (Pictures, Downloads)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                // Untuk Android Q (API 29) ke atas, tidak perlu izin WRITE_EXTERNAL_STORAGE secara eksplisit
-                // jika menyimpan ke MediaStore.
                 saveQrisImage();
             } else {
-                // Untuk Android 9 (API 28) ke bawah, masih perlu izin WRITE_EXTERNAL_STORAGE
                 if (ContextCompat.checkSelfPermission(PembayaranQrisActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(PembayaranQrisActivity.this,
@@ -93,7 +81,6 @@ public class PembayaranQrisActivity extends AppCompatActivity {
         });
 
         buttonSelanjutnyaQris.setOnClickListener(v -> {
-            // Lanjutkan ke Activity berikutnya (UploadBuktiActivity)
             Intent intent = new Intent(PembayaranQrisActivity.this, UploadBuktiActivity.class);
             intent.putExtra("USER_ID", userId);
             intent.putExtra("PROJECT_ID", projectId);
@@ -105,7 +92,6 @@ public class PembayaranQrisActivity extends AppCompatActivity {
     }
 
     private void saveQrisImage() {
-        // Pastikan imageViewQris memiliki gambar
         BitmapDrawable drawable = (BitmapDrawable) imageViewQris.getDrawable();
         if (drawable == null) {
             Toast.makeText(this, "Gambar QRIS tidak tersedia untuk diunduh.", Toast.LENGTH_SHORT).show();
@@ -123,7 +109,7 @@ public class PembayaranQrisActivity extends AppCompatActivity {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
                 contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
-                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + "KumpulDanaQRIS"); // Disimpan di folder Pictures/KumpulDanaQRIS
+                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + "KumpulDanaQRIS");
 
                 imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
                 if (imageUri == null) {
@@ -131,25 +117,20 @@ public class PembayaranQrisActivity extends AppCompatActivity {
                 }
                 fos = getContentResolver().openOutputStream(imageUri);
             } else {
-                // Menggunakan FileOutputStream untuk Android P (API 28) ke bawah
-                // Ini akan disimpan di direktori Pictures publik
                 File imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-                File appSpecificDir = new File(imagesDir, "KumpulDanaQRIS"); // Sub-folder khusus
+                File appSpecificDir = new File(imagesDir, "KumpulDanaQRIS");
                 if (!appSpecificDir.exists()) {
-                    appSpecificDir.mkdirs(); // Buat folder jika tidak ada
+                    appSpecificDir.mkdirs();
                 }
                 File imageFile = new File(appSpecificDir, filename);
                 fos = new FileOutputStream(imageFile);
             }
 
             if (fos != null) {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos); // Kompres gambar
-                fos.close(); // Tutup stream
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+                fos.close(); //
 
-                // Jika di Android Q+, tidak perlu MediaScanner lagi karena MediaStore sudah otomatis
-                // Jika di Android P-, beritahu MediaScanner bahwa ada file baru
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                    // Ini penting agar gambar muncul di Galeri
                     Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                     Uri contentUri = Uri.fromFile(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + File.separator + "KumpulDanaQRIS" + File.separator + filename));
                     mediaScanIntent.setData(contentUri);

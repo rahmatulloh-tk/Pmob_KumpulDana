@@ -8,21 +8,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.kumpul_dana.adapter.ProjectAdapter;
 import com.example.kumpul_dana.R;
 import com.example.kumpul_dana.database.DatabaseHelper;
-import com.example.kumpul_dana.ui.PilihProyekActivity;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class HomeActivity extends AppCompatActivity {
 
     private TextView textViewHaiUser;
-    private TextView textViewDonasiCount; // Untuk "4 Donasi"
-    private Button buttonEditProfil; // Tombol "Edit profil" di header
-    private Button buttonIsiFormDonasi; // Tombol "ISI FORM DONASI"
-    private Button buttonRiwayatDonasi; // Tombol "LIHAT RIWAYAT DONASI"
+    private TextView textViewSaldo;
+    private View saldoClickableArea;
+    private Button buttonLogout; // Mengganti nama variabel agar lebih jelas
+    private Button buttonIsiFormDonasi;
+    private Button buttonRiwayatDonasi;
 
     private DatabaseHelper dbHelper;
-    private int currentLoggedInUserId; // Variabel untuk menyimpan ID pengguna yang sedang login
+    private int currentLoggedInUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,60 +34,50 @@ public class HomeActivity extends AppCompatActivity {
 
         // Inisialisasi elemen-elemen UI
         textViewHaiUser = findViewById(R.id.textViewHaiUser);
-        textViewDonasiCount = findViewById(R.id.textViewDonasiCount);
-        buttonEditProfil = findViewById(R.id.buttonEditProfil);
+        textViewSaldo = findViewById(R.id.textViewSaldo);
+        saldoClickableArea = findViewById(R.id.saldoClickableArea);
+        // Pastikan ID di activity_home.xml adalah 'buttonLogoutUser'
+        buttonLogout = findViewById(R.id.buttonLogoutUser);
         buttonIsiFormDonasi = findViewById(R.id.buttonIsiFormDonasi);
         buttonRiwayatDonasi = findViewById(R.id.buttonRiwayatDonasi);
-
 
         // --- Mendapatkan ID pengguna dari SharedPreferences ---
         SharedPreferences prefs = getSharedPreferences("user_session", MODE_PRIVATE);
         currentLoggedInUserId = prefs.getInt("user_id", -1); // Ambil ID pengguna
 
-        // Mengambil dan menampilkan username berdasarkan ID yang didapat
-        if (currentLoggedInUserId != -1) {
-            String username = dbHelper.getUsername(currentLoggedInUserId); // Ambil username dari database
-            if (username != null && !username.isEmpty()) {
-                textViewHaiUser.setText("Hai, " + username + "!"); // Contoh: "Hai, Mutiara Shinta"
-            } else {
-                textViewHaiUser.setText("Hai, Pengguna!"); // Fallback jika username kosong/null
-            }
-            // Mengambil dan menampilkan jumlah donasi aktual
-            int totalDonasi = dbHelper.getTotalDonationsForUser(currentLoggedInUserId); // Memanggil fungsi baru di DatabaseHelper
-            textViewDonasiCount.setText(totalDonasi + " Donasi");
-        } else {
-            // Jika tidak ada user_id di SharedPreferences (contoh: belum login atau sesi habis)
-            textViewHaiUser.setText("Hai, Tamu!");
-            textViewDonasiCount.setText("0 Donasi");
-            Toast.makeText(this, "Sesi Anda berakhir. Mohon login kembali.", Toast.LENGTH_LONG).show();
-            // Opsional: Langsung arahkan ke LoginActivity
-            Intent loginIntent = new Intent(HomeActivity.this, LoginActivity.class);
-            startActivity(loginIntent);
-            finish(); // Tutup HomeActivity
-        }
-
         // --- Set Listener untuk Tombol-Tombol User ---
 
-        buttonEditProfil.setOnClickListener(new View.OnClickListener() {
+        // === FUNGSI LOGOUT DITAMBAHKAN DI SINI ===
+        buttonLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentLoggedInUserId != -1) {
-                    Toast.makeText(HomeActivity.this, "Fitur Edit Profil belum dibuat", Toast.LENGTH_SHORT).show();
-                    // Intent intent = new Intent(HomeActivity.this, EditProfilActivity.class);
-                    // intent.putExtra("USER_ID", currentLoggedInUserId); // Jika EditProfil butuh USER_ID
-                    // startActivity(intent);
-                } else {
-                    Toast.makeText(HomeActivity.this, "Mohon login untuk mengedit profil.", Toast.LENGTH_SHORT).show();
-                }
+                // Hapus data sesi dari SharedPreferences
+                SharedPreferences.Editor editor = getSharedPreferences("user_session", MODE_PRIVATE).edit();
+                editor.remove("user_id"); // Hapus ID pengguna yang tersimpan
+                editor.putBoolean("isLoggedIn", false); // Tandai sebagai sudah logout
+                editor.apply();
+
+                // Tampilkan pesan logout berhasil
+                Toast.makeText(HomeActivity.this, "Anda berhasil logout", Toast.LENGTH_SHORT).show();
+
+                // Arahkan kembali ke LoginActivity
+                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                // Flags ini untuk membersihkan semua activity sebelumnya dari stack,
+                // sehingga pengguna tidak bisa kembali ke HomeActivity dengan menekan tombol back.
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+
+                // Tutup HomeActivity
+                finish();
             }
         });
 
         buttonIsiFormDonasi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentLoggedInUserId != -1) { // Pastikan user sudah login
+                if (currentLoggedInUserId != -1) {
                     Intent intent = new Intent(HomeActivity.this, PilihProyekActivity.class);
-                    intent.putExtra("USER_ID", currentLoggedInUserId); // <<< PENTING: Meneruskan USER_ID
+                    intent.putExtra("USER_ID", currentLoggedInUserId);
                     startActivity(intent);
                 } else {
                     Toast.makeText(HomeActivity.this, "Mohon login untuk mengisi form donasi.", Toast.LENGTH_SHORT).show();
@@ -97,23 +88,37 @@ public class HomeActivity extends AppCompatActivity {
         buttonRiwayatDonasi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentLoggedInUserId != -1) { // Pastikan user sudah login
+                if (currentLoggedInUserId != -1) {
                     Intent intent = new Intent(HomeActivity.this, RiwayatDonasiActivity.class);
-                    intent.putExtra("USER_ID", currentLoggedInUserId); // <<< PENTING: Meneruskan USER_ID
+                    intent.putExtra("USER_ID", currentLoggedInUserId);
                     startActivity(intent);
                 } else {
                     Toast.makeText(HomeActivity.this, "Mohon login untuk melihat riwayat donasi.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        saldoClickableArea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentLoggedInUserId != -1) {
+                    Intent intent = new Intent(HomeActivity.this, TopUpSaldoActivity.class);
+                    intent.putExtra("USER_ID", currentLoggedInUserId);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(HomeActivity.this, "Mohon login untuk mengisi saldo.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Panggil updateUI() untuk pertama kali saat activity dibuat
+        updateUI();
     }
 
-    // Metode ini akan dipanggil setiap kali activity kembali ke foreground
     @Override
     protected void onResume() {
         super.onResume();
-        // Perbarui tampilan jika ada perubahan data (misal setelah donasi baru)
-        updateUI();
+        updateUI(); // Memperbarui UI setiap kali activity aktif kembali
     }
 
     private void updateUI() {
@@ -127,12 +132,18 @@ public class HomeActivity extends AppCompatActivity {
             } else {
                 textViewHaiUser.setText("Hai, Pengguna!");
             }
-            int totalDonasi = dbHelper.getTotalDonationsForUser(currentLoggedInUserId);
-            textViewDonasiCount.setText(totalDonasi + " Donasi");
+
+            double userBalance = dbHelper.getUserBalance(currentLoggedInUserId);
+            NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
+            String formattedBalance = formatRupiah.format(userBalance).replace(",00", "");
+            textViewSaldo.setText("Rp " + formattedBalance); // Sedikit merapikan format
         } else {
-            textViewHaiUser.setText("Hai, Tamu!");
-            textViewDonasiCount.setText("0 Donasi");
-            // Tidak perlu Toast atau redirect di onResume, karena bisa mengganggu
+            // Jika tidak ada user ID, langsung arahkan ke login
+            Toast.makeText(this, "Sesi Anda berakhir. Mohon login kembali.", Toast.LENGTH_LONG).show();
+            Intent loginIntent = new Intent(HomeActivity.this, LoginActivity.class);
+            loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(loginIntent);
+            finish();
         }
     }
 }

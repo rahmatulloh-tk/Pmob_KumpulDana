@@ -5,7 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_gray_background" tools:context=".ui.HomeActivity">
+    android:background="@color/light_gray_background"
+    tools:context=".ui.HomeActivity">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerLayout"
         android:layout_width="match_parent"
@@ -29,32 +31,71 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textViewDonasiCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="4 Donasi"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:fontFamily="@font/opensans_regular"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewHaiUser" />
-
         <Button
-            android:id="@+id/buttonEditProfil"
+            android:id="@+id/buttonLogoutUser"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Edit profil"
+            android:text="Log Out"
             android:textColor="@color/white"
             android:fontFamily="@font/opensans_semibold"
             android:textSize="14sp"
             android:layout_marginEnd="24dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/textViewHaiUser"
-            app:layout_constraintBottom_toBottomOf="@+id/textViewDonasiCount" />
+            app:layout_constraintBottom_toBottomOf="@+id/textViewHaiUser"
+            tools:ignore="RelativeOverlap" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/saldoClickableArea"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewHaiUser">
+
+            <ImageView
+                android:id="@+id/imageViewCoin"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/coins_solid"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@android:color/white" />
+
+            <TextView
+                android:id="@+id/textViewSaldo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/opensans_regular"
+                android:text="   0    "
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageViewCoin"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageViewPlus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/square_plus"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/textViewSaldo"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@android:color/white" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

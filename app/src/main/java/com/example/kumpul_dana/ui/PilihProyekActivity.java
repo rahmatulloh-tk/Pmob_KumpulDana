@@ -58,10 +58,7 @@ public class PilihProyekActivity extends AppCompatActivity {
             @Override
             public void onItemClick(Project project) {
                 Intent intent = new Intent(PilihProyekActivity.this, BuatDonasiActivity.class);
-
-                // --- PERUBAHAN DI SINI: Samakan nama "PROJECT_ID" ---
-                intent.putExtra("PROJECT_ID", project.getId()); // Ganti "projectId" menjadi "PROJECT_ID"
-                // ---------------------------------------------------
+                intent.putExtra("PROJECT_ID", project.getId());
 
                 intent.putExtra("projectTitle", project.getTitle());
                 intent.putExtra("targetAmount", project.getTargetAmount());

@@ -37,7 +37,7 @@ public class UploadBuktiActivity extends AppCompatActivity {
     private ImageView backButtonUpload;
 
     private DatabaseHelper dbHelper;
-    private Uri selectedImageUri; // Untuk menyimpan URI gambar yang dipilih
+    private Uri selectedImageUri;
 
     // Data donasi yang akan diterima dari Intent
     private int userId;
@@ -46,7 +46,6 @@ public class UploadBuktiActivity extends AppCompatActivity {
     private String paymentMethod;
     private String message;
 
-    // ActivityResultLauncher untuk memilih gambar dari galeri
     private ActivityResultLauncher<String> pickImageLauncher;
 
     @Override
@@ -75,10 +74,9 @@ public class UploadBuktiActivity extends AppCompatActivity {
                     if (uri != null) {
                         selectedImageUri = uri;
                         imageViewUploadedProof.setImageURI(selectedImageUri);
-                        imageViewUploadedProof.setScaleType(ImageView.ScaleType.CENTER_CROP); // Sesuaikan scaleType
-                        textViewAddImage.setVisibility(View.GONE); // Sembunyikan teks "Tambah Gambar"
+                        imageViewUploadedProof.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        textViewAddImage.setVisibility(View.GONE);
                     } else {
-                        // Pengguna tidak memilih gambar (misal, menekan tombol kembali)
                         Toast.makeText(UploadBuktiActivity.this, "Pemilihan gambar dibatalkan.", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -98,22 +96,16 @@ public class UploadBuktiActivity extends AppCompatActivity {
     }
 
     private void openImagePicker() {
-        // PERHATIAN: Untuk Android 13 (API 33) ke atas, READ_EXTERNAL_STORAGE tidak lagi diperlukan
-        // jika menggunakan ActivityResultContracts.GetContent (ACTION_GET_CONTENT)
-        // karena sistem akan memberikan akses URI sementara.
-        // Namun, jika Anda menargetkan API < 33 dan tetap ingin meminta izin, blok ini tetap relevan.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            // Meminta izin READ_EXTERNAL_STORAGE jika versi Android di bawah 13 (API 33)
+            // Meminta izin READ_EXTERNAL_STORAGE
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        1); // Request code bisa sembarang angka, tapi pastikan unik
-                return; // Keluar dari metode ini, tunggu hasil permintaan izin
+                        1);
+                return;
             }
         }
-        // Luncurkan picker gambar
-        // Ini akan membuka aplikasi galeri/file manager sistem
         pickImageLauncher.launch("image/*");
     }
 
@@ -136,7 +128,7 @@ public class UploadBuktiActivity extends AppCompatActivity {
     private void submitDonation() {
         // Ambil tanggal donasi saat ini
         String donationDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-        String status = "Pending"; // Atau "Completed" jika donasi dianggap selesai saat submit
+        String status = "Pending";
         String proofImagePath = (selectedImageUri != null) ? selectedImageUri.toString() : null;
 
         long result = dbHelper.createDonation(

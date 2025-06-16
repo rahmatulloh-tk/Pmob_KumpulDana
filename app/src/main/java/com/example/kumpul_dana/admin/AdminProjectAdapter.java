@@ -1,8 +1,7 @@
-// File: AdminProjectAdapter.java
 package com.example.kumpul_dana.admin;
 
 import android.content.Context;
-import android.net.Uri; // Diperlukan untuk setImageURI
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +17,8 @@ import com.example.kumpul_dana.R;
 import com.example.kumpul_dana.model.Project;
 
 import java.util.List;
-import java.util.Locale; // Impor Locale
-import java.text.NumberFormat; // Untuk format mata uang
+import java.util.Locale;
+import java.text.NumberFormat;
 
 public class AdminProjectAdapter extends RecyclerView.Adapter<AdminProjectAdapter.ProjectViewHolder> {
 
@@ -37,8 +36,8 @@ public class AdminProjectAdapter extends RecyclerView.Adapter<AdminProjectAdapte
     }
 
     public interface OnProjectClickListener {
-        void onProjectClick(int projectId); // Menerima int
-        void onEditClick(int projectId);    // Menerima int
+        void onProjectClick(int projectId);
+        void onEditClick(int projectId);
     }
 
     @NonNull
@@ -52,13 +51,11 @@ public class AdminProjectAdapter extends RecyclerView.Adapter<AdminProjectAdapte
     public void onBindViewHolder(@NonNull ProjectViewHolder holder, int position) {
         Project project = projectList.get(position);
 
-        // Set gambar proyek
         if (project.getImagePath() != null && !project.getImagePath().isEmpty()) {
             Uri imageUri = Uri.parse(project.getImagePath());
             holder.imageViewProjectImage.setImageURI(imageUri);
         } else {
-            // Set gambar placeholder jika tidak ada gambar
-            holder.imageViewProjectImage.setImageResource(R.drawable.image_background); // Ganti dengan placeholder Anda
+            holder.imageViewProjectImage.setImageResource(R.drawable.image_background);
         }
 
         holder.textViewProjectTitle.setText(project.getTitle());
@@ -71,28 +68,28 @@ public class AdminProjectAdapter extends RecyclerView.Adapter<AdminProjectAdapte
         holder.textViewCollectedAmount.setText(collectedFormatted + " dari " + targetFormatted);
 
         // Penanganan ProgressBar
-        if (holder.progressBarProject != null) { // Null check untuk keamanan
+        if (holder.progressBarProject != null) {
             if (project.getTargetAmount() > 0) {
                 int progress = (int) ((project.getCollectedAmount() / project.getTargetAmount()) * 100);
                 holder.progressBarProject.setProgress(progress);
             } else {
-                holder.progressBarProject.setProgress(0); // Jika target 0 atau belum ada, set progress ke 0
+                holder.progressBarProject.setProgress(0);
             }
         }
 
         // Tampilkan sisa waktu yang sudah diformat dari objek Project
-        holder.textViewTimeLeft.setText(project.getFormattedTimeLeft()); // PERBAIKAN: Memanggil getFormattedTimeLeft()
+        holder.textViewTimeLeft.setText(project.getFormattedTimeLeft());
 
         // Set listener untuk item klik keseluruhan (opsional, jika ingin ada aksi klik pada item)
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onProjectClick(project.getId()); // ID adalah int
+                listener.onProjectClick(project.getId());
             }
         });
 
         holder.buttonEditProject.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onEditClick(project.getId()); // ID adalah int
+                listener.onEditClick(project.getId());
             }
         });
     }

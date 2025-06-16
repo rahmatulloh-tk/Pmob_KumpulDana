@@ -35,7 +35,7 @@
             android:id="@+id/textViewAdminRoleInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Panel Kontrol Utama"
+            android:text="Panel Kontrol"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:fontFamily="@font/opensans_regular"
@@ -95,7 +95,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Manajemen Event Donasi"
+                android:text="Proyek Donasi"
                 android:textSize="16sp"
                 android:textColor="@color/text_dark"
                 android:fontFamily="@font/opensans_semibold" />
@@ -135,8 +135,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Verifikasi Donasi"
-                android:textSize="16sp"
+                android:text="Riwayat Donasi" android:textSize="16sp"
                 android:textColor="@color/text_dark"
                 android:fontFamily="@font/opensans_semibold" />
 
@@ -144,8 +143,7 @@
                 android:id="@+id/buttonVerifyDonations"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Verifikasi Donasi Masuk"
-                android:layout_marginTop="16dp"
+                android:text="Lihat Semua Donasi" android:layout_marginTop="16dp"
                 android:backgroundTint="@color/button_primary"
                 android:textColor="@android:color/white"
                 android:fontFamily="@font/opensans_semibold"
@@ -175,8 +173,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Manajemen Pengguna"
-                android:textSize="16sp"
+                android:text="Data Pengguna" android:textSize="16sp"
                 android:textColor="@color/text_dark"
                 android:fontFamily="@font/opensans_semibold" />
 
@@ -184,8 +181,7 @@
                 android:id="@+id/buttonManajemenUsers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Kelola Akun Pengguna"
-                android:layout_marginTop="16dp"
+                android:text="Lihat Data Pengguna" android:layout_marginTop="16dp"
                 android:backgroundTint="@color/button_primary"
                 android:textColor="@android:color/white"
                 android:fontFamily="@font/opensans_semibold"
